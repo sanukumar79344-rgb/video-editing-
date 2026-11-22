@@ -91,3 +91,27 @@ in HyperFrames.
   (gitignored, never committed).
 - ffmpeg does not use this session's HTTPS proxy, so `--download-sections`
   fails; download the full source with yt-dlp and cut locally instead.
+
+## Editorial brief (user standard — applies to every source)
+
+Goal: moments that stop the scroll, create curiosity, and pay off — not merely
+"interesting sentences". Finished, publication-ready shorts, not raw clips.
+
+- Understand the whole source (context, emotion, story) before choosing.
+- 5–8 clips per source, 25–50 s, quality over count; reject weak ones.
+- Hook in the first 1–2 s; build curiosity; don't reveal the answer early;
+  end on a payoff, twist or memorable line.
+- Cut dead air, repetition and slow explanation, but never change meaning.
+- Edit with purpose only: jump cuts, punch-ins on key lines, keyword colour
+  highlights, B-roll/reaction shots when available, SFX for emphasis, mood
+  music under speech, noise cleanup, consistent colour. No over-editing.
+- Captions accurate, word-synced, mobile-readable, inside safe zones, never
+  over the speaker's face.
+- Export 9:16, ≥1080x1920, source frame rate, MP4, no borders/watermarks.
+- Package each clip with: title, opening hook, source timestamps, caption,
+  hashtags, 3–6 word cover text, and why it could perform.
+- QC every clip as an editor would; replace any clip that is boring,
+  incomplete or feels artificial.
+- Never fabricate dialogue, never use copyrighted music/footage without
+  permission (only user-supplied or royalty-free assets from Assets/),
+  never promise virality, keep creator attribution.
