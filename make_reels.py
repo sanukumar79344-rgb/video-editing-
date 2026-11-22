@@ -224,9 +224,11 @@ def decode_pcm(audio, t0=None, dur=None):
     return np.frombuffer(pcm, np.int16).astype(np.float32) / 32768.0
 
 
-def words_from(model, pcm, offset=0.0, language="hi"):
+def words_from(model, pcm, offset=0.0, language=None, beam=5):
+    """language=None lets each chunk auto-detect: this show mixes Hindi and English,
+    and forcing one language turns the other into phonetic nonsense."""
     segs, _ = model.transcribe(pcm, language=language, word_timestamps=True,
-                               vad_filter=True, beam_size=5,
+                               vad_filter=True, beam_size=beam,
                                condition_on_previous_text=False)
     out = []
     for s in segs:
@@ -238,15 +240,15 @@ def words_from(model, pcm, offset=0.0, language="hi"):
     return out
 
 
-def transcribe_regions(audio, regions, model_size, work, language="hi"):
-    cache = work / f"scan_words_{model_size}.json"
+def transcribe_regions(audio, regions, model_size, work, language=None, beam=1):
+    cache = work / f"scan_words_{model_size}_{language or 'auto'}_b{beam}.json"
     if cache.exists():
         return json.loads(cache.read_text())
     model = load_model(model_size)
     words = []
     for k, (t0, t1) in enumerate(regions, 1):
         print(f"[scan] region {k}/{len(regions)}  {fmt_ts(t0)}-{fmt_ts(t1)}", file=sys.stderr)
-        words += words_from(model, decode_pcm(audio, t0, t1 - t0), offset=t0, language=language)
+        words += words_from(model, decode_pcm(audio, t0, t1 - t0), offset=t0, language=language, beam=beam)
         cache.write_text(json.dumps(words))
     return words
 
@@ -381,7 +383,10 @@ def main():
     ap.add_argument("--regions", type=int, default=40, help="how many 90 s regions to transcribe in the scan")
     ap.add_argument("--scan-model", default="small")
     ap.add_argument("--caption-model", default="medium")
-    ap.add_argument("--language", default="hi")
+    ap.add_argument("--language", default=None, help="force a language code; default auto-detect per chunk")
+    ap.add_argument("--scan-beam", type=int, default=1, help="beam size for the scan pass (1 = fast greedy)")
+    ap.add_argument("--video", help="local full-quality source to cut from (skips section downloads)")
+    ap.add_argument("--only", help="render just these ranks, e.g. 1,2,3")
     ap.add_argument("--select-only", action="store_true", help="stop after choosing moments")
     args = ap.parse_args()
 
@@ -395,7 +400,7 @@ def main():
     regions = shortlist(energy, heat_at, duration, regions=args.regions)
     print(f"[scan] {len(regions)} regions, {sum(b - a for a, b in regions) / 60:.0f} min of audio to transcribe",
           file=sys.stderr)
-    words = transcribe_regions(audio, regions, args.scan_model, work, args.language)
+    words = transcribe_regions(audio, regions, args.scan_model, work, args.language, args.scan_beam)
     print(f"[scan] {len(words)} words", file=sys.stderr)
     picked, n_cands = select(words, energy, heat_at, args.max_clips)
     print(f"[select] {len(picked)} clips from {n_cands} candidate windows", file=sys.stderr)
@@ -409,16 +414,23 @@ def main():
 
     cap_model = load_model(args.caption_model)
     report = []
+    only = {int(x) for x in args.only.split(",")} if args.only else None
     for k, c in enumerate(picked, 1):
+        if only and k not in only:
+            continue
         t_in, t_out = c[3], c[4]
         name = f"Reel_{k:02d}"
-        sect = work / f"{name}_src.mp4"
-        off_file = work / f"{name}_offset.json"
-        if sect.exists() and off_file.exists():
-            off = json.loads(off_file.read_text())["offset"]
+        if args.video:
+            # Whole source already on disk: cut straight out of it, timestamps are absolute.
+            sect, off = Path(args.video), t_in
         else:
-            _, off = download_section(args.source, t_in, t_out, sect, args.cookies)
-            off_file.write_text(json.dumps({"offset": off}))
+            sect = work / f"{name}_src.mp4"
+            off_file = work / f"{name}_offset.json"
+            if sect.exists() and off_file.exists():
+                off = json.loads(off_file.read_text())["offset"]
+            else:
+                _, off = download_section(args.source, t_in, t_out, sect, args.cookies)
+                off_file.write_text(json.dumps({"offset": off}))
         src = probe(sect)
         dur = t_out - t_in
         # exact, drift-free captions: transcribe the cut itself

@@ -259,14 +259,17 @@ def face_crop_x(video, t_in, t_out, src_w, src_h):
     while t < t_out:
         cap.set(cv2.CAP_PROP_POS_MSEC, t * 1000)
         ok, frame = cap.read()
-        t += 0.5
+        t += 1.0
         if not ok:
             continue
+        if frame.shape[1] > 960:        # detect on a small copy: 4K frames are far too slow
+            frame = cv2.resize(frame, (960, round(960 * frame.shape[0] / frame.shape[1])))
         g = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = det.detectMultiScale(g, 1.1, 6, minSize=(src_h // 10, src_h // 10))
+        fh, fw = g.shape[:2]
+        faces = det.detectMultiScale(g, 1.1, 6, minSize=(fh // 10, fh // 10))
         if len(faces):
             x, y, w, h = max(faces, key=lambda f: f[2] * f[3])
-            xs.append((x + w / 2) / src_w)
+            xs.append((x + w / 2) / fw)
     cap.release()
     if len(xs) < 4:
         return None
@@ -365,7 +368,9 @@ def normalize_audio(video, t_in, dur, wav):
 def render(video, src, t_in, t_out, peak_rel, ass_path, out, face_x):
     dur = t_out - t_in
     fps = src["fps"]
-    out_fps = 60 if fps > 45 else 30          # Reels/Shorts-friendly; matches 30/60 sources exactly
+    # Keep the source cadence when it is already Reels/Shorts-friendly (24/25/30), so no frame
+    # is duplicated; only odd or high rates are normalised.
+    out_fps = 60 if fps > 45 else (round(fps) if 23 <= fps <= 31 else 30)
     # Punch-in: ease from 1.00 → 1.12 over 0.35 s starting just before the peak, hold to the end.
     z0, z1, a, b = 1.0, 1.12, max(0.0, peak_rel - 0.15), max(0.0, peak_rel - 0.15) + 0.35
     zexpr = (f"if(lt(t,{a:.3f}),{z0},if(lt(t,{b:.3f}),{z0}+({z1}-{z0})*(1-cos(PI*(t-{a:.3f})/{b - a:.3f}))/2,{z1}))")
