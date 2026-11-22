@@ -191,15 +191,22 @@ def measure(path):
 
 
 # --------------------------------------------------------------------------- main entry
-def render(video, t_in, t_out, words, out, work, credit=None, captions=True):
+def render(video, t_in, t_out, words, out, work, credit=None, captions=True, layout="crop", hook=None):
     work = Path(work); work.mkdir(parents=True, exist_ok=True)
     src = probe(video)
     fps = round(src["fps"]) if 23 <= src["fps"] <= 31 else (60 if src["fps"] > 45 else 30)
     segs = segments(words, t_in, t_out)
+    if hook:                                   # cold open: the clip's own peak moment, played first
+        segs = [(hook[0], hook[1], [])] + segs
+    if layout == "split":                      # one camera shot per segment, so each gets the right layout
+        segs = split_at_cuts(segs, scene_cuts(video, t_in, t_out))
     graph, total, cut_words = [], 0.0, []
     for i, (a, b, ws) in enumerate(segs):
-        fx = face_x(video, a, b, src["w"], src["h"])
-        graph.append(seg_filter(i, a, b, fx, src["w"], src["h"], 1.08 if i % 2 else 1.0))
+        if layout == "split":
+            graph.append(split_filter(i, a, b, video, src["w"], src["h"], 1.05 if i % 2 else 1.0))
+        else:
+            fx = face_x(video, a, b, src["w"], src["h"])
+            graph.append(seg_filter(i, a, b, fx, src["w"], src["h"], 1.08 if i % 2 else 1.0))
         for w in ws:
             cut_words.append(dict(w, t0=w["t0"] - a + total, t1=w["t1"] - a + total))
         total += b - a
@@ -237,3 +244,124 @@ def render(video, t_in, t_out, words, out, work, credit=None, captions=True):
     return {"file": str(out), "segments": n, "cuts_removed_s": round((t_out - t_in) - total, 2),
             "duration_s": round(o["duration"], 2), "width": o["w"], "height": o["h"], "fps": round(o["fps"], 2),
             "words": cut_words, **measure(out)}
+
+
+# --------------------------------------------------------------------------- split-screen
+PANEL_H = 957          # two panels + a 6 px divider = 1920
+
+
+def _region_luma(video, t, x, y, w, h):
+    import cv2
+    cap = cv2.VideoCapture(str(video)); cap.set(cv2.CAP_PROP_POS_MSEC, t * 1000)
+    ok, fr = cap.read(); cap.release()
+    if not ok:
+        return 255.0
+    sh, sw = fr.shape[:2]
+    sx, sy = sw / 1920, sh / 1080
+    roi = fr[int(y * sy):int((y + h) * sy), int(x * sx):int((x + w) * sx)]
+    return float(roi.mean())
+
+
+def is_meme_shot(video, a, b):
+    """The source shows a watched clip as a black-barred centre column between the two hosts."""
+    hits = sum(_region_luma(video, a + (b - a) * f, 700, 0, 520, 120) < 18 for f in (0.25, 0.5, 0.75))
+    return hits >= 2
+
+
+def meme_box(video, a, b):
+    """Non-black bounding box of the centre column during [a, b] (source pixels)."""
+    p = subprocess.run(["ffmpeg", "-hide_banner", "-ss", f"{a:.3f}", "-t", f"{max(0.5, b - a):.3f}", "-i", str(video),
+                        "-vf", "crop=640:1080:640:0,cropdetect=limit=24:round=2:reset=0", "-f", "null", "-"],
+                       capture_output=True, text=True)
+    m = re.findall(r"crop=(\d+):(\d+):(\d+):(\d+)", p.stderr)
+    if not m:
+        return 640, 1080, 640, 0
+    w, h, x, y = map(int, m[-1])
+    return w, h, 640 + x, y
+
+
+def face_tracks(video, a, b):
+    """Faces in [a, b] as (x, y, size) in 1920x1080 source pixels, clustered left-to-right."""
+    import cv2
+    det = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+    cap = cv2.VideoCapture(str(video)); pts = []
+    for f in (0.2, 0.5, 0.8):
+        cap.set(cv2.CAP_PROP_POS_MSEC, (a + (b - a) * f) * 1000)
+        ok, fr = cap.read()
+        if not ok:
+            continue
+        fr = cv2.resize(fr, (960, 540)); g = cv2.cvtColor(fr, cv2.COLOR_BGR2GRAY)
+        for x, y, w, h in det.detectMultiScale(g, 1.08, 5, minSize=(28, 28)):
+            pts.append(((x + w / 2) * 2, (y + h / 2) * 2, w * 2))
+    cap.release()
+    pts.sort()
+    groups = []
+    for p_ in pts:
+        if groups and abs(p_[0] - groups[-1][-1][0]) < 260:
+            groups[-1].append(p_)
+        else:
+            groups.append([p_])
+    groups = [g_ for g_ in groups if len(g_) >= 2]                   # seen in at least 2 samples
+    groups.sort(key=lambda g_: -sum(q[2] for q in g_))
+    groups = sorted(groups[:2], key=lambda g_: g_[0][0])
+    med = lambda v: sorted(v)[len(v) // 2]
+    return [(med([q[0] for q in g_]), med([q[1] for q in g_]), med([q[2] for q in g_])) for g_ in groups]
+
+
+def scene_cuts(video, a, b, thr=0.28):
+    """Camera cut times (absolute seconds) inside [a, b]."""
+    p_ = subprocess.run(["ffmpeg", "-hide_banner", "-ss", f"{a:.3f}", "-t", f"{b - a:.3f}", "-i", str(video),
+                         "-vf", f"scale=320:-2,select='gt(scene,{thr})',showinfo", "-f", "null", "-"],
+                        capture_output=True, text=True)
+    return [a + float(t) for t in re.findall(r"pts_time:([\d.]+)", p_.stderr)]
+
+
+def split_at_cuts(segs, cuts, min_len=0.4):
+    out = []
+    for a, b, ws in segs:
+        pts = [a] + [t for t in cuts if a + min_len < t < b - min_len] + [b]
+        for x, y in zip(pts, pts[1:]):
+            out.append((x, y, [w for w in ws if x <= w["t0"] < y]))
+    return out
+
+
+def split_filter(i, a, b, video, sw, sh, zoom):
+    trim = f"[0:v]trim=start={a:.3f}:end={b:.3f},setpts=PTS-STARTPTS"
+    sx, sy = sw / 1920, sh / 1080
+
+    def c(w, h, x, y):
+        return f"crop={round(w * sx)}:{round(h * sy)}:{round(x * sx)}:{round(y * sy)}"
+    if is_meme_shot(video, a, b):
+        mw, mh, mx, my = meme_box(video, a, b)
+        top = (f"[t{i}]{c(mw, mh, mx, my)},scale={W}:{PANEL_H}:force_original_aspect_ratio=decrease:flags=lanczos,"
+               f"pad={W}:{PANEL_H}:(ow-iw)/2:(oh-ih)/2:color=black[top{i}]")
+        half = W // 2
+        bot = (f"[b{i}]split[l{i}][r{i}];"
+               f"[l{i}]{c(560, 994, 40, 30)},scale={half}:{PANEL_H}:flags=lanczos[ll{i}];"
+               f"[r{i}]{c(560, 994, 1320, 30)},scale={half}:{PANEL_H}:flags=lanczos[rr{i}];"
+               f"[ll{i}][rr{i}]hstack=2[bot{i}]")
+    else:
+        faces = face_tracks(video, a, b)
+        if len(faces) < 2:
+            # close-up of one person: a full-bleed 9:16 frame on that face
+            fx = faces[0][0] / 1920 if faces else 0.5
+            return seg_filter(i, a, b, fx, sw, sh, 1.08 if zoom > 1.0 else 1.0)
+        (lx, ly, ls), (rx, ry, rs) = faces[0], faces[1]
+        ch = min(1080, max(520, round(max(ls, rs) * 3.2)))      # face takes ~1/3 of the panel height
+        cw = round(ch * W / PANEL_H)
+
+        def box(fx, fy):
+            x = int(min(max(fx - cw / 2, 0), 1920 - cw)); y = int(min(max(fy - ch * 0.42, 0), 1080 - ch))
+            return c(cw, ch, x, y)
+        top = f"[t{i}]{box(lx, ly)},scale={W}:{PANEL_H}:flags=lanczos[top{i}]"
+        bot = f"[b{i}]{box(rx, ry)},scale={W}:{PANEL_H}:flags=lanczos[bot{i}]"
+    z = ""
+    if zoom > 1.0:
+        zw, zh = round(W * zoom / 2) * 2, round(PANEL_H * zoom / 2) * 2
+        z = f",scale={zw}:{zh}:flags=lanczos,crop={W}:{PANEL_H}"
+    return (f"{trim},split[t{i}][b{i}];{top};{bot};"
+            f"[bot{i}]null{z}[botz{i}];"
+            f"[top{i}][botz{i}]vstack=2,pad={W}:{H}:0:0:color=white,"
+            f"drawbox=x=0:y={PANEL_H}:w={W}:h={H - 2 * PANEL_H}:color=white:t=fill,setsar=1[v{i}];"
+            f"[0:a]atrim=start={a:.3f}:end={b:.3f},asetpts=PTS-STARTPTS,"
+            f"afade=t=in:d=0.01,afade=t=out:st={max(0, b - a - 0.012):.3f}:d=0.012[a{i}]")
