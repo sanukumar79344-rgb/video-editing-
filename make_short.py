@@ -351,9 +351,13 @@ def normalize_audio(video, t_in, dur, wav):
     fades = f"afade=t=in:st=0:d={FADE},afade=t=out:st={dur - FADE:.3f}:d={FADE}"
     gain = 0.0
     for _ in range(3):
+        # Limit at 4x rate so inter-sample (true) peaks are caught, then come back to 48 kHz.
+        # Limiting at 48 kHz first (as a plain chain would) leaves overshoots the AAC
+        # encoder then amplifies — measured up to +2.9 dB over the ceiling.
         run(["ffmpeg", "-y", "-v", "error", "-i", str(stage1), "-af",
-             f"volume={gain:.2f}dB,alimiter=limit={10 ** ((TP - 0.5) / 20):.4f}:level=false:attack=1:release=50,"
-             f"aresample=192000,aresample=48000,{fades}", "-c:a", "pcm_s24le", str(wav)])
+             f"volume={gain:.2f}dB,aresample=192000,"
+             f"alimiter=limit={10 ** ((TP - 0.5) / 20):.4f}:level=false:attack=1:release=50,"
+             f"aresample=48000,{fades}", "-c:a", "pcm_s24le", str(wav)])
         lv = measure_output(wav)
         if lv["integrated_lufs"] is None or abs(lv["integrated_lufs"] - LUFS) <= 0.3:
             break
