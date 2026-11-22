@@ -266,7 +266,7 @@ def face_crop_x(video, t_in, t_out, src_w, src_h):
             frame = cv2.resize(frame, (960, round(960 * frame.shape[0] / frame.shape[1])))
         g = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         fh, fw = g.shape[:2]
-        faces = det.detectMultiScale(g, 1.1, 6, minSize=(fh // 10, fh // 10))
+        faces = det.detectMultiScale(g, 1.1, 5, minSize=(fh // 16, fh // 16))
         if len(faces):
             x, y, w, h = max(faces, key=lambda f: f[2] * f[3])
             xs.append((x + w / 2) / fw)
@@ -385,8 +385,8 @@ def render(video, src, t_in, t_out, peak_rel, ass_path, out, face_x):
         # Wide shot: sharp full frame on a blurred, darkened 9:16 fill (keeps everything in the safe zone).
         base = (f"[0:v]split[a][b];"
                 f"[a]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},boxblur=30:3,eq=brightness=-0.08[bg];"
-                f"[b]scale={W}:-2:flags=lanczos[fg];"
-                f"[bg][fg]overlay=(W-w)/2:(H-h)/2-120,setsar=1[base]")
+                f"[b]scale={round(W * 1.12 / 2) * 2}:-2:flags=lanczos,crop={W}:ih:(iw-{W})/2:0[fg];"
+                f"[bg][fg]overlay=(W-w)/2:(H-h)/2-90,setsar=1[base]")
     zoom = (f"[base]scale=w='trunc({W}*({zexpr})/2)*2':h='trunc({H}*({zexpr})/2)*2':eval=frame:flags=bicubic,"
             f"crop={W}:{H}:(iw-{W})/2:(ih-{H})/2*0.85")
     ass_esc = str(ass_path).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
