@@ -69,33 +69,31 @@ def segments(words, t_in, t_out):
 
 # --------------------------------------------------------------------------- framing
 def face_x(video, a, b, sw, sh):
-    """Centre x (0..1) of the single prominent face in [a, b], or None."""
+    """Centre x (0..1) of the largest face across samples in [a, b]; 0.5 if none found."""
     import cv2
     det = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
     cap = cv2.VideoCapture(str(video))
     xs = []
-    for t in (a + (b - a) * f for f in (0.2, 0.5, 0.8)):
-        cap.set(cv2.CAP_PROP_POS_MSEC, t * 1000)
+    n = max(3, int((b - a) / 0.7))
+    for j in range(n):
+        cap.set(cv2.CAP_PROP_POS_MSEC, (a + (b - a) * (j + 0.5) / n) * 1000)
         ok, fr = cap.read()
         if not ok:
             continue
         fr = cv2.resize(fr, (960, round(960 * fr.shape[0] / fr.shape[1])))
         g = cv2.cvtColor(fr, cv2.COLOR_BGR2GRAY)
         fh, fw = g.shape
-        faces = det.detectMultiScale(g, 1.1, 5, minSize=(fh // 9, fh // 9))
-        if len(faces) == 1:                       # one clear speaker only
-            x, y, w, h = faces[0]
-            if w / fw > 0.08:
-                xs.append((x + w / 2) / fw)
+        faces = det.detectMultiScale(g, 1.1, 5, minSize=(fh // 12, fh // 12))
+        if len(faces):
+            x, y, w, h = max(faces, key=lambda f: f[2] * f[3])
+            xs.append((x + w / 2) / fw)
     cap.release()
-    if len(xs) >= 2 and max(xs) - min(xs) < 0.12:
-        return sorted(xs)[len(xs) // 2]
-    return None
+    return sorted(xs)[len(xs) // 2] if xs else 0.5
 
 
 def seg_filter(i, a, b, fx, sw, sh, zoom):
     trim = f"[0:v]trim=start={a:.3f}:end={b:.3f},setpts=PTS-STARTPTS"
-    if fx is not None:
+    if True:                                  # always a full-bleed 9:16 crop
         cw = min(sw, round(sh * 9 / 16 / 2) * 2)
         x = int(min(max(fx * sw - cw / 2, 0), sw - cw))
         base = f"{trim},crop={cw}:{sh}:{x}:0,scale={W}:{H}:flags=lanczos"
@@ -136,6 +134,9 @@ Style: Credit,Montserrat ExtraBold,30,&H80FFFFFF,&H80FFFFFF,&H90000000,&H0000000
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
+    # Whisper sometimes emits stray non-Latin characters; captions are Latin-only.
+    ws = [dict(w, w=re.sub(r"[^A-Za-z0-9%'.,?!-]", "", w["w"])) for w in ws]
+    ws = [w for w in ws if w["w"]]
     cards, cur = [], []
     for k, w in enumerate(ws):
         cur.append(w)
@@ -190,7 +191,7 @@ def measure(path):
 
 
 # --------------------------------------------------------------------------- main entry
-def render(video, t_in, t_out, words, out, work, credit=None):
+def render(video, t_in, t_out, words, out, work, credit=None, captions=True):
     work = Path(work); work.mkdir(parents=True, exist_ok=True)
     src = probe(video)
     fps = round(src["fps"]) if 23 <= src["fps"] <= 31 else (60 if src["fps"] > 45 else 30)
@@ -198,7 +199,7 @@ def render(video, t_in, t_out, words, out, work, credit=None):
     graph, total, cut_words = [], 0.0, []
     for i, (a, b, ws) in enumerate(segs):
         fx = face_x(video, a, b, src["w"], src["h"])
-        graph.append(seg_filter(i, a, b, fx, src["w"], src["h"], 1.10 if i % 2 else 1.0))
+        graph.append(seg_filter(i, a, b, fx, src["w"], src["h"], 1.08 if i % 2 else 1.0))
         for w in ws:
             cut_words.append(dict(w, t0=w["t0"] - a + total, t1=w["t1"] - a + total))
         total += b - a
@@ -221,8 +222,11 @@ def render(video, t_in, t_out, words, out, work, credit=None):
     ass = work / f"{stem}.ass"
     build_ass(cut_words, total, ass, credit)
     esc = str(ass).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
+    burn = f"ass='{esc}'," if (captions or credit) else ""
+    if not captions:
+        build_ass([], total, ass, credit)
     run(["ffmpeg", "-y", "-hide_banner", "-v", "error", "-i", str(inter), "-i", str(clean),
-         "-vf", f"ass='{esc}',fade=t=in:st=0:d=0.15,fade=t=out:st={total - 0.2:.3f}:d=0.2",
+         "-vf", f"{burn}fade=t=in:st=0:d=0.15,fade=t=out:st={total - 0.2:.3f}:d=0.2",
          "-map", "0:v", "-map", "1:a", "-c:v", "libx264", "-profile:v", "high", "-preset", "slow", "-crf", "18",
          "-pix_fmt", "yuv420p", "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
          "-g", str(fps * 2), "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-movflags", "+faststart",
