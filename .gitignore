@@ -3,3 +3,16 @@ out/
 *.wav
 cookies.txt
 __pycache__/
+tools/whisper.cpp/
+tools/*/node_modules/
+tools/*/demo/
+tools/*.log
+tools/*/install.log
+Raw Footage/*
+!Raw Footage/README.md
+References/*
+!References/README.md
+Assets/*
+!Assets/README.md
+Exports/*
+!Exports/README.md
