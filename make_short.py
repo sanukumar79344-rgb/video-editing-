@@ -41,6 +41,8 @@ LUFS, TP, LRA = -14.0, -1.0, 11.0
 # top 250 px (header), bottom 480 px (caption/handle/music), right 140 px (buttons).
 SAFE_TOP, SAFE_BOTTOM, SAFE_LEFT, SAFE_RIGHT = 250, 480, 90, 140
 
+CAP_FONT_SIZE = 84     # caption height in px on the 1080x1920 canvas
+
 
 def run(cmd, **kw):
     print("+", " ".join(str(c) for c in cmd), file=sys.stderr)
@@ -296,20 +298,24 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Cap,Inter ExtraBold,84,&H00FFFFFF,&H00FFFFFF,&H00000000,&H99000000,-1,0,0,0,100,100,0,0,1,7,3,2,{SAFE_LEFT + 30},{SAFE_RIGHT + 30},{margin_v},1
+Style: Cap,Inter ExtraBold,{CAP_FONT_SIZE},&H00FFFFFF,&H00FFFFFF,&H00000000,&H99000000,-1,0,0,0,100,100,0,0,1,{max(5, round(CAP_FONT_SIZE / 12))},3,2,{SAFE_LEFT + 30},{SAFE_RIGHT + 30},{margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     ws = [dict(w, t0=w["t0"] - t_in, t1=w["t1"] - t_in) for w in words[i:j + 1]]
     clip_len = t_out - t_in
-    # Group into cards: break on punctuation, pauses, or 3 words / 16 chars.
+    # Group into cards: break on punctuation, pauses, or 3 words / a line that would wrap.
+    # Inter ExtraBold averages ~0.58 em per glyph, so derive the limit from the font size
+    # rather than hard-coding it — a bigger font must take fewer words per card.
+    usable = W - (SAFE_LEFT + 30) - (SAFE_RIGHT + 30)
+    max_chars = max(8, int(usable / (0.58 * CAP_FONT_SIZE)))
     cards, cur = [], []
     for k, w in enumerate(ws):
         cur.append(w)
         nxt_gap = ws[k + 1]["t0"] - w["t1"] if k + 1 < len(ws) else 9
         chars = sum(len(x["w"]) + 1 for x in cur)
-        if re.search(r"[.,?!;:…]$", w["w"]) or nxt_gap > 0.35 or len(cur) >= 3 or chars >= 16:
+        if re.search(r"[.,?!;:…]$", w["w"]) or nxt_gap > 0.35 or len(cur) >= 3 or chars >= max_chars:
             cards.append(cur); cur = []
     if cur:
         cards.append(cur)
@@ -351,9 +357,13 @@ def normalize_audio(video, t_in, dur, wav):
     fades = f"afade=t=in:st=0:d={FADE},afade=t=out:st={dur - FADE:.3f}:d={FADE}"
     gain = 0.0
     for _ in range(3):
+        # Limit at 4x rate so inter-sample (true) peaks are caught, then come back to 48 kHz.
+        # Limiting at 48 kHz first (as a plain chain would) leaves overshoots the AAC
+        # encoder then amplifies — measured up to +2.9 dB over the ceiling.
         run(["ffmpeg", "-y", "-v", "error", "-i", str(stage1), "-af",
-             f"volume={gain:.2f}dB,alimiter=limit={10 ** ((TP - 0.5) / 20):.4f}:level=false:attack=1:release=50,"
-             f"aresample=192000,aresample=48000,{fades}", "-c:a", "pcm_s24le", str(wav)])
+             f"volume={gain:.2f}dB,aresample=192000,"
+             f"alimiter=limit={10 ** ((TP - 0.5) / 20):.4f}:level=false:attack=1:release=50,"
+             f"aresample=48000,{fades}", "-c:a", "pcm_s24le", str(wav)])
         lv = measure_output(wav)
         if lv["integrated_lufs"] is None or abs(lv["integrated_lufs"] - LUFS) <= 0.3:
             break
