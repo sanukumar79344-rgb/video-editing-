@@ -289,7 +289,7 @@ def ass_time(t):
 
 def build_ass(words, i, j, t_in, t_out, path):
     """Word-by-word highlighted captions, 1–3 words per card, inside the safe zone."""
-    margin_v = SAFE_BOTTOM + 170          # caption baseline ≈ 1270 px from top: lower-middle, clear of UI
+    margin_v = SAFE_BOTTOM + 120          # sits in the clean band under the video, clear of both UIs
     head = f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: {W}
@@ -299,7 +299,7 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Cap,Inter ExtraBold,84,&H00FFFFFF,&H00FFFFFF,&H00000000,&H99000000,-1,0,0,0,100,100,0,0,1,7,3,2,{SAFE_LEFT + 30},{SAFE_RIGHT + 30},{margin_v},1
+Style: Cap,Montserrat ExtraBold,76,&H00FFFFFF,&H00FFFFFF,&H00000000,&HB0000000,-1,0,0,0,100,100,1,0,1,6,4,2,{SAFE_LEFT + 30},{SAFE_RIGHT + 30},{margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -386,7 +386,7 @@ def render(video, src, t_in, t_out, peak_rel, ass_path, out, face_x):
         base = (f"[0:v]split[a][b];"
                 f"[a]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},boxblur=30:3,eq=brightness=-0.08[bg];"
                 f"[b]scale={round(W * 1.12 / 2) * 2}:-2:flags=lanczos,crop={W}:ih:(iw-{W})/2:0[fg];"
-                f"[bg][fg]overlay=(W-w)/2:(H-h)/2-90,setsar=1[base]")
+                f"[bg][fg]overlay=(W-w)/2:(H-h)/2-250,setsar=1[base]")
     zoom = (f"[base]scale=w='trunc({W}*({zexpr})/2)*2':h='trunc({H}*({zexpr})/2)*2':eval=frame:flags=bicubic,"
             f"crop={W}:{H}:(iw-{W})/2:(ih-{H})/2*0.85")
     ass_esc = str(ass_path).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
