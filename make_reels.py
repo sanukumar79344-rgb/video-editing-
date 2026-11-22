@@ -117,7 +117,31 @@ def romanize(text):
     txt = ''.join(x[0] for x in out)
     for a, b in (('chchh', 'cch'), ('shch', 'sch'), ('nn', 'n')):
         txt = txt.replace(a, b)
-    return txt
+    return _ENGLISH_FIXUP.get(txt.strip('.,!?'), txt)
+
+
+# Whisper writes English words heard in Hindi speech phonetically in Devanagari, which romanises
+# to things like "konphidens". Map the frequent ones back to real spelling. Only unambiguous
+# entries belong here: never one that collides with a Hindi word (jab, kam, man, bar, par...).
+_ENGLISH_FIXUP = {
+    'konphidens': 'confidence', 'kanphidens': 'confidence', 'konphidans': 'confidence',
+    'ligal': 'legal', 'notis': 'notice', 'episod': 'episode', 'episodd': 'episode',
+    'rikvest': 'request', 'rikvast': 'request', 'chenj': 'change', 'laip': 'life',
+    'laiph': 'life', 'ophis': 'office', 'aphis': 'office', 'promoshan': 'promotion',
+    'promoshn': 'promotion', 'stej': 'stage', 'sizan': 'season', 'sisan': 'season',
+    'sijan': 'season', 'skil': 'skill', 'skills': 'skills', 'bhidio': 'video',
+    'vidio': 'video', 'chainal': 'channel', 'chainel': 'channel', 'kament': 'comment',
+    'sabskraib': 'subscribe', 'intarnet': 'internet', 'kampani': 'company',
+    'mobail': 'mobile', 'kamedi': 'comedy', 'komedi': 'comedy', 'jok': 'joke',
+    'pholoyars': 'followers', 'pholovars': 'followers', 'phainal': 'final',
+    'phainali': 'finally', 'parphormens': 'performance', 'parphorm': 'perform',
+    'audiyens': 'audience', 'audians': 'audience', 'jajes': 'judges', 'jaj': 'judge',
+    'prablem': 'problem', 'problam': 'problem', 'rilesanship': 'relationship',
+    'inglish': 'English', 'hindi': 'Hindi', 'internashnal': 'international',
+    'enargy': 'energy', 'enarji': 'energy', 'phemili': 'family', 'phaimili': 'family',
+    'kalej': 'college', 'skool': 'school', 'ekzam': 'exam', 'intarbhyu': 'interview',
+    'salari': 'salary', 'mesej': 'message', 'photo': 'photo', 'instagram': 'Instagram',
+}
 
 
 # --------------------------------------------------------------------------- 1. audio
