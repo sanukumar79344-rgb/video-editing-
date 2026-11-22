@@ -458,7 +458,8 @@ def main():
         src = probe(sect)
         dur = t_out - t_in
         # exact, drift-free captions: transcribe the cut itself
-        cw = words_from(cap_model, decode_pcm(sect, off, dur), offset=off, language=args.language)
+        cw = words_from(cap_model, decode_pcm(sect, off, dur), offset=off,
+                        language=args.language, beam=args.scan_beam)
         if not cw:
             print(f"! {name}: no speech found in the cut, skipping", file=sys.stderr)
             continue
