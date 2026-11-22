@@ -1,5 +1,5 @@
-work/
-out/
+work*/
+out*/
 *.wav
 cookies.txt
 __pycache__/
