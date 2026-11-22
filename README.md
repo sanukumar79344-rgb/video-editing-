@@ -60,3 +60,30 @@ fill for wide shots), word-highlight captions in the safe zone, −14 LUFS /
   `CascadeClassifier`, which silently disables face-tracked cropping.
 * **YouTube** needs `--cookies cookies.txt` whenever it asks you to sign in, and
   the sandbox must allow `*.googlevideo.com` (YouTube rotates the host per video).
+
+## Making YouTube links work
+
+A YouTube URL needs two things in a sandboxed environment. A local file path
+needs neither — `python3 make_clips.py video.mp4 -n 3` works as-is.
+
+**1. Sign-in cookies.** YouTube answers most datacentre requests with
+"Sign in to confirm you're not a bot". Export cookies from a browser that is
+logged in to YouTube:
+
+* Install a `cookies.txt` extension (Chrome: "Get cookies.txt LOCALLY";
+  Firefox: "cookies.txt"). Both export the Netscape format yt-dlp expects.
+* Open <https://www.youtube.com> while signed in, click the extension, and
+  export **only youtube.com** cookies.
+* Save the file as `cookies.txt` in this repo. It is already in `.gitignore`,
+  so it will not be committed — treat it like a password, since it grants
+  access to the signed-in account.
+* Run with `--cookies cookies.txt`. Re-export when downloads start failing
+  again; these cookies expire.
+
+**2. Network access for the video CDN.** YouTube streams each video from a
+rotating `rr<N>---sn-<id>.googlevideo.com` host, so naming hosts one by one
+does not work. In the cloud environment menu in the session title bar, choose
+**Edit**, then either set Network access to unrestricted, or add
+`*.googlevideo.com` under **Allowed domains** (leave "Allow package managers"
+ticked). Keep `www.youtube.com` and `youtubei.googleapis.com` allowed too.
+See <https://code.claude.com/docs/en/cloud-environments#network-access>.
