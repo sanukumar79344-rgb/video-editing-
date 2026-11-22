@@ -253,7 +253,8 @@ def words_from(model, pcm, offset=0.0, language=None, beam=5):
     and forcing one language turns the other into phonetic nonsense."""
     segs, _ = model.transcribe(pcm, language=language, word_timestamps=True,
                                vad_filter=True, beam_size=beam,
-                               condition_on_previous_text=False)
+                               condition_on_previous_text=False,
+                               no_repeat_ngram_size=3, repetition_penalty=1.15)
     out = []
     for s in segs:
         for w in s.words or []:
