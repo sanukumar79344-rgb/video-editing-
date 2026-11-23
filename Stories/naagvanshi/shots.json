@@ -1,0 +1,524 @@
+[
+ {
+  "kind": "visual",
+  "after": 0,
+  "beat": "1 — COLD OPEN | 0:00–0:20 | 40 words",
+  "text": "Atmosphere plate. Dense forest at night. Fog between trees. Camera slowly pushes through the fog toward a faint orange glow in the distance."
+ },
+ {
+  "kind": "sfx",
+  "after": 0,
+  "beat": "1 — COLD OPEN | 0:00–0:20 | 40 words",
+  "text": "संगीत — low drone, rising"
+ },
+ {
+  "kind": "sfx",
+  "after": 0,
+  "beat": "1 — COLD OPEN | 0:00–0:20 | 40 words",
+  "text": "झींगुर"
+ },
+ {
+  "kind": "sfx",
+  "after": 1,
+  "beat": "1 — COLD OPEN | 0:00–0:20 | 40 words",
+  "text": "कुत्तों का भौंकना — abrupt, then dead silence"
+ },
+ {
+  "kind": "visual",
+  "after": 1,
+  "beat": "2 — THE RULE | 0:20–0:55 | 75 words",
+  "text": "Medium. Interior of a dimly lit mud house. An old woman (Dadi Kamla) lies on a cot, frail, breathing heavily. A young man (Arjun, 22) sits beside her, holding her hand. Oil lamp flickers. Camera at Arjun's eye level."
+ },
+ {
+  "kind": "sfx",
+  "after": 3,
+  "beat": "2 — THE RULE | 0:20–0:55 | 75 words",
+  "text": "गहरी सांस लेने की आवाज़"
+ },
+ {
+  "kind": "silent",
+  "after": 4,
+  "beat": "2 — THE RULE | 0:20–0:55 | 75 words",
+  "seconds": 5.0,
+  "text": "Dadi's hand goes limp. The oil lamp flickers violently and dies. Complete darkness. Camera holds on Arjun's face illuminated only by moonlight from the window."
+ },
+ {
+  "kind": "sfx",
+  "after": 4,
+  "beat": "2 — THE RULE | 0:20–0:55 | 75 words",
+  "text": "संगीत — sharp sting"
+ },
+ {
+  "kind": "visual",
+  "after": 4,
+  "beat": "3 — THE VIOLATION | 0:55–1:40 | 110 words",
+  "text": "Wide establishing. Next morning. The village cremation ground beside a river. Smoke rises from a pyre. Villagers stand in a semicircle. Arjun stands closest, face blank. Camera slowly pulls back."
+ },
+ {
+  "kind": "silent",
+  "after": 5,
+  "beat": "3 — THE VIOLATION | 0:55–1:40 | 110 words",
+  "seconds": 8.0,
+  "text": "Arjun watches the pyre burn. He looks around — villagers whisper to each other, glancing at him. An old man (Mukhiya ji) catches his eye, then looks away. The smoke rises left-to-right across the frame."
+ },
+ {
+  "kind": "sfx",
+  "after": 5,
+  "beat": "3 — THE VIOLATION | 0:55–1:40 | 110 words",
+  "text": "संगीत — low, mournful"
+ },
+ {
+  "kind": "visual",
+  "after": 5,
+  "beat": "3 — THE VIOLATION | 0:55–1:40 | 110 words",
+  "text": "Medium. Arjun walks up to Mukhiya ji. Both face camera — Arjun frame-left, Mukhiya frame-right."
+ },
+ {
+  "kind": "sfx",
+  "after": 8,
+  "beat": "3 — THE VIOLATION | 0:55–1:40 | 110 words",
+  "text": "हवा चलने की आवाज़ — a sudden cold gust"
+ },
+ {
+  "kind": "visual",
+  "after": 9,
+  "beat": "4 — FIRST CONTACT | 1:40–2:50 | 150 words",
+  "text": "Wide establishing. Night. Dadi's old house from outside. One window glows with an oil lamp. Surrounding forest is pitch black. Full moon behind clouds."
+ },
+ {
+  "kind": "sfx",
+  "after": 9,
+  "beat": "4 — FIRST CONTACT | 1:40–2:50 | 150 words",
+  "text": "झींगुर"
+ },
+ {
+  "kind": "sfx",
+  "after": 9,
+  "beat": "4 — FIRST CONTACT | 1:40–2:50 | 150 words",
+  "text": "कुत्तों का भौंकना — distant, uneasy"
+ },
+ {
+  "kind": "visual",
+  "after": 10,
+  "beat": "4 — FIRST CONTACT | 1:40–2:50 | 150 words",
+  "text": "Medium. Arjun sits on the floor, going through Dadi's old trunk. Old photos, prayer beads, a rusted key, and a cloth-wrapped object. He picks up the cloth bundle."
+ },
+ {
+  "kind": "silent",
+  "after": 11,
+  "beat": "4 — FIRST CONTACT | 1:40–2:50 | 150 words",
+  "seconds": 6.0,
+  "text": "Arjun unwraps it slowly. Inside is an old, yellowed photograph — a stone temple with a giant serpent carved on it, and a glowing green stone at the serpent's hood. Camera pushes in on the photo."
+ },
+ {
+  "kind": "sfx",
+  "after": 11,
+  "beat": "4 — FIRST CONTACT | 1:40–2:50 | 150 words",
+  "text": "संगीत — tension building"
+ },
+ {
+  "kind": "sfx",
+  "after": 12,
+  "beat": "4 — FIRST CONTACT | 1:40–2:50 | 150 words",
+  "text": "पायल — faint, rhythmic, growing closer"
+ },
+ {
+  "kind": "sfx",
+  "after": 12,
+  "beat": "4 — FIRST CONTACT | 1:40–2:50 | 150 words",
+  "text": "झींगुर — cut to dead silence"
+ },
+ {
+  "kind": "visual",
+  "after": 12,
+  "beat": "4 — FIRST CONTACT | 1:40–2:50 | 150 words",
+  "text": "Close. Arjun's face. Eyes widen. He turns toward the window. Camera holds on his face — the moonlight shifts."
+ },
+ {
+  "kind": "visual",
+  "after": 13,
+  "beat": "4 — FIRST CONTACT | 1:40–2:50 | 150 words",
+  "text": "Wide. POV from window. At the edge of the forest, about 50 meters away — a woman in white, long black hair, standing completely still. Moonlight illuminates her from behind. Face not visible. She faces Arjun's direction."
+ },
+ {
+  "kind": "silent",
+  "after": 13,
+  "beat": "4 — FIRST CONTACT | 1:40–2:50 | 150 words",
+  "seconds": 10.0,
+  "text": "The woman stands motionless. Wind moves her hair slightly. Fog curls around her feet. A snake slithers past her feet — she doesn't move. Arjun grips the windowsill. Camera slowly pushes toward the woman, but she remains distant and unclear."
+ },
+ {
+  "kind": "sfx",
+  "after": 13,
+  "beat": "4 — FIRST CONTACT | 1:40–2:50 | 150 words",
+  "text": "चीखने की आवाज़ — a distant, unearthly wail, not quite human"
+ },
+ {
+  "kind": "sfx",
+  "after": 13,
+  "beat": "4 — FIRST CONTACT | 1:40–2:50 | 150 words",
+  "text": "अचानक ज़ोर से सांस लेने की आवाज़ — Arjun gasps"
+ },
+ {
+  "kind": "visual",
+  "after": 13,
+  "beat": "4 — FIRST CONTACT | 1:40–2:50 | 150 words",
+  "text": "Close reaction. Arjun stumbles back from the window. Radial speed lines. He looks again — the woman is gone. Only fog remains."
+ },
+ {
+  "kind": "visual",
+  "after": 13,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "Wide establishing. Next morning. Bright sunlight. The village square. Arjun walks through — villagers stop talking when he passes. Women pull their children inside. Camera follows Arjun left-to-right."
+ },
+ {
+  "kind": "visual",
+  "after": 14,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "Medium. Arjun stops an old woman. She pulls her hand away."
+ },
+ {
+  "kind": "sfx",
+  "after": 16,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "संगीत — uneasy undertone"
+ },
+ {
+  "kind": "silent",
+  "after": 17,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "seconds": 7.0,
+  "text": "Arjun walks back to the house, left-to-right. Cut: his feet on the dirt path. Cut: the old house in the distance, forest looming behind it. He enters. The door creaks shut."
+ },
+ {
+  "kind": "visual",
+  "after": 17,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "Medium. Interior. Arjun examines the old photograph again. On the back, in faded ink — \"नागमणि — कभी मत खोलना\" in Dadi's handwriting."
+ },
+ {
+  "kind": "sfx",
+  "after": 17,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "संगीत — discovery sting"
+ },
+ {
+  "kind": "visual",
+  "after": 18,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "Close. Arjun's hands find a hidden compartment in the trunk. Inside — a small brass box, sealed with red thread and vermillion. Snake symbols etched on the lid."
+ },
+ {
+  "kind": "silent",
+  "after": 18,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "seconds": 5.0,
+  "text": "Arjun holds the brass box. His hands tremble slightly. He brings it closer to the lamp. The snake carvings seem to shift in the flickering light."
+ },
+ {
+  "kind": "sfx",
+  "after": 19,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "पायल — sudden, loud, right outside the door"
+ },
+ {
+  "kind": "sfx",
+  "after": 19,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "हंसी — a woman's soft laugh, chilling"
+ },
+ {
+  "kind": "visual",
+  "after": 19,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "Close reaction. Arjun drops the box. Camera whips to the door. Radial speed lines."
+ },
+ {
+  "kind": "visual",
+  "after": 20,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "Medium. Arjun grabs the oil lamp and slowly approaches the door. Camera behind his shoulder. He opens the door — creak."
+ },
+ {
+  "kind": "silent",
+  "after": 20,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "seconds": 8.0,
+  "text": "The doorway is empty. But on the ground, right at the threshold — a trail of fresh marigold flowers leading toward the forest. And in the dirt, footprints — but not human. Snake-trail marks between human footprints. Camera follows the trail into the darkness, then stops."
+ },
+ {
+  "kind": "sfx",
+  "after": 20,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "कुत्तों का भौंकना — frantic, then abrupt silence"
+ },
+ {
+  "kind": "sfx",
+  "after": 20,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "संगीत — tension rises"
+ },
+ {
+  "kind": "visual",
+  "after": 21,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "Wide. Arjun steps outside, looks toward the forest. At the treeline — a brief flash of white cloth disappearing between the trees. Gone in an instant."
+ },
+ {
+  "kind": "silent",
+  "after": 22,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "seconds": 12.0,
+  "text": "Arjun follows the marigold trail into the forest. Cut: his feet stepping on dry leaves. Cut: lamp swinging, shadows on tree trunks. Cut: wide shot — Arjun's small figure swallowed by the dark forest, moving left-to-right. The marigold trail glows faintly in the lamplight."
+ },
+ {
+  "kind": "sfx",
+  "after": 22,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "पायल — distant, ahead of him, like guiding him deeper"
+ },
+ {
+  "kind": "sfx",
+  "after": 22,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "झींगुर — then silence"
+ },
+ {
+  "kind": "visual",
+  "after": 23,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "Wide establishing. The ruined Naag temple. Massive stone serpent carved over the entrance, broken in places. Overgrown with roots and vines. Moonlight falls directly on the entrance. The marigold trail ends here."
+ },
+ {
+  "kind": "sfx",
+  "after": 23,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "संगीत — grand, ominous reveal"
+ },
+ {
+  "kind": "visual",
+  "after": 24,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "Medium. Arjun stands at the temple entrance, lamp raised. He sees something inside — fresh flowers, lit diyas, as if someone worships here every night."
+ },
+ {
+  "kind": "sfx",
+  "after": 25,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "हंसी — the same woman's laugh, echoing from inside the temple"
+ },
+ {
+  "kind": "sfx",
+  "after": 25,
+  "beat": "5 — ESCALATION CYCLES | 2:50–5:50 | 430 words",
+  "text": "पायल — from deep inside"
+ },
+ {
+  "kind": "visual",
+  "after": 25,
+  "beat": "6 — THE LORE DUMP | 5:50–7:15 | 200 words",
+  "text": "Medium. Arjun runs back through the forest, left-to-right. He reaches the village. Bangs on a door — Tantrik Baba Devnarayan's hut. The old tantrik opens the door, sees Arjun's face, and pulls him inside immediately."
+ },
+ {
+  "kind": "sfx",
+  "after": 27,
+  "beat": "6 — THE LORE DUMP | 5:50–7:15 | 200 words",
+  "text": "संगीत — flashback transition"
+ },
+ {
+  "kind": "visual",
+  "after": 27,
+  "beat": "6 — THE LORE DUMP | 5:50–7:15 | 200 words",
+  "text": "Wide. FLASHBACK — 300 years ago. Daylight. A grand stone temple, intact and beautiful. A young woman (Nagini priestess) performs rituals. She wears a green stone around her neck — the Naagmani. Everything is golden-lit, warm, peaceful. Camera moves left-to-right along the temple pillars."
+ },
+ {
+  "kind": "visual",
+  "after": 28,
+  "beat": "6 — THE LORE DUMP | 5:50–7:15 | 200 words",
+  "text": "Medium. FLASHBACK — A Thakur (Arjun's ancestor) arrives with soldiers. Night. Torches. They break into the temple. The Thakur grabs the Naagmani from the priestess."
+ },
+ {
+  "kind": "sfx",
+  "after": 29,
+  "beat": "6 — THE LORE DUMP | 5:50–7:15 | 200 words",
+  "text": "चीखने की आवाज़ — the priestess screaming, echoing"
+ },
+ {
+  "kind": "sfx",
+  "after": 29,
+  "beat": "6 — THE LORE DUMP | 5:50–7:15 | 200 words",
+  "text": "संगीत — horror sting"
+ },
+ {
+  "kind": "visual",
+  "after": 29,
+  "beat": "6 — THE LORE DUMP | 5:50–7:15 | 200 words",
+  "text": "Close. FLASHBACK — The priestess's face as the wall closes around her. Her eyes turn serpentine — green, slit pupils. She speaks through the closing gap."
+ },
+ {
+  "kind": "silent",
+  "after": 30,
+  "beat": "6 — THE LORE DUMP | 5:50–7:15 | 200 words",
+  "seconds": 5.0,
+  "text": "FLASHBACK ends. Back to present — Tantrik Baba's face in the lamplight. Grave, afraid."
+ },
+ {
+  "kind": "sfx",
+  "after": 32,
+  "beat": "6 — THE LORE DUMP | 5:50–7:15 | 200 words",
+  "text": "संगीत — doom"
+ },
+ {
+  "kind": "visual",
+  "after": 32,
+  "beat": "7 — THE PLAN | 7:15–8:25 | 170 words",
+  "text": "Medium. Tantrik Baba stands, opens an old chest. Pulls out a scroll — a hand-drawn map of the temple interior."
+ },
+ {
+  "kind": "sfx",
+  "after": 37,
+  "beat": "7 — THE PLAN | 7:15–8:25 | 170 words",
+  "text": "संगीत — urgency"
+ },
+ {
+  "kind": "visual",
+  "after": 37,
+  "beat": "7 — THE PLAN | 7:15–8:25 | 170 words",
+  "text": "Close. Arjun's face — determined, afraid, but resolved. Camera pushes in slowly."
+ },
+ {
+  "kind": "silent",
+  "after": 38,
+  "beat": "7 — THE PLAN | 7:15–8:25 | 170 words",
+  "seconds": 6.0,
+  "text": "Arjun walks back to Dadi's house alone in the dark. Camera follows from behind, the forest looming on both sides. The house's silhouette against the moonlit sky. He enters. The door shuts."
+ },
+ {
+  "kind": "sfx",
+  "after": 38,
+  "beat": "7 — THE PLAN | 7:15–8:25 | 170 words",
+  "text": "पायल — very faint, from the direction of the temple"
+ },
+ {
+  "kind": "visual",
+  "after": 38,
+  "beat": "8 — CONFRONTATION | 8:25–9:30 | 160 words",
+  "text": "Medium. Interior. Night — the second night. Arjun sits with the brass box on the table. Oil lamp burning. He unwraps the red thread slowly."
+ },
+ {
+  "kind": "sfx",
+  "after": 39,
+  "beat": "8 — CONFRONTATION | 8:25–9:30 | 160 words",
+  "text": "संगीत — tension peak"
+ },
+ {
+  "kind": "visual",
+  "after": 39,
+  "beat": "8 — CONFRONTATION | 8:25–9:30 | 160 words",
+  "text": "Close. The box opens. Inside — a green, glowing stone. It pulses with light like a heartbeat. The room fills with a faint green glow. Arjun's face in the green light — awe and terror."
+ },
+ {
+  "kind": "sfx",
+  "after": 40,
+  "beat": "8 — CONFRONTATION | 8:25–9:30 | 160 words",
+  "text": "पायल — growing louder rapidly"
+ },
+ {
+  "kind": "sfx",
+  "after": 40,
+  "beat": "8 — CONFRONTATION | 8:25–9:30 | 160 words",
+  "text": "हंसी — right behind Arjun"
+ },
+ {
+  "kind": "visual",
+  "after": 40,
+  "beat": "8 — CONFRONTATION | 8:25–9:30 | 160 words",
+  "text": "Close reaction. Arjun spins around. Camera whips. Standing in the doorway — the woman in white. But closer now. Her hair covers her face. Her feet don't touch the ground. Green serpentine eyes glow through her hair. Speed lines, squiggle marks."
+ },
+ {
+  "kind": "sfx",
+  "after": 40,
+  "beat": "8 — CONFRONTATION | 8:25–9:30 | 160 words",
+  "text": "अचानक ज़ोर से सांस लेने की आवाज़"
+ },
+ {
+  "kind": "visual",
+  "after": 41,
+  "beat": "8 — CONFRONTATION | 8:25–9:30 | 160 words",
+  "text": "Symmetrical portrait. Naagkanya — frontal, centered, floating. Hair parts slightly to reveal half her face — beautiful but terrifying. One eye serpentine green. Snake patterns appear on her skin."
+ },
+ {
+  "kind": "sfx",
+  "after": 42,
+  "beat": "8 — CONFRONTATION | 8:25–9:30 | 160 words",
+  "text": "संगीत — horror crescendo"
+ },
+ {
+  "kind": "sfx",
+  "after": 42,
+  "beat": "8 — CONFRONTATION | 8:25–9:30 | 160 words",
+  "text": "कराहने की आवाज़"
+ },
+ {
+  "kind": "visual",
+  "after": 42,
+  "beat": "8 — CONFRONTATION | 8:25–9:30 | 160 words",
+  "text": "Wide. The oil lamp explodes. Complete darkness. Only the Naagmani glows green. In its light — the Naagkanya glides toward Arjun. Snakes pour in from the door and windows."
+ },
+ {
+  "kind": "silent",
+  "after": 42,
+  "beat": "8 — CONFRONTATION | 8:25–9:30 | 160 words",
+  "seconds": 6.0,
+  "text": "Darkness. The green glow pulses. Snake hissing fills the room. Arjun scrambles backward, clutching the Naagmani. The glow illuminates the Naagkanya's face inches from his — then blackout."
+ },
+ {
+  "kind": "sfx",
+  "after": 42,
+  "beat": "9 — CLIFFHANGER ENDING | 9:30–10:00 | 70 words",
+  "text": "संगीत — dramatic, continuous under everything"
+ },
+ {
+  "kind": "visual",
+  "after": 42,
+  "beat": "9 — CLIFFHANGER ENDING | 9:30–10:00 | 70 words",
+  "text": "Wide. Morning. Tantrik Baba and villagers rush to Dadi's house. The door is open. Inside — the room is destroyed. Snake skin everywhere. The brass box is empty. Arjun is gone. On the wall, scratched deep into the mud — a serpent symbol."
+ },
+ {
+  "kind": "sfx",
+  "after": 43,
+  "beat": "9 — CLIFFHANGER ENDING | 9:30–10:00 | 70 words",
+  "text": "संगीत — peak"
+ },
+ {
+  "kind": "sfx",
+  "after": 43,
+  "beat": "9 — CLIFFHANGER ENDING | 9:30–10:00 | 70 words",
+  "text": "पायल — one last time, fading"
+ },
+ {
+  "kind": "visual",
+  "after": 43,
+  "beat": "9 — CLIFFHANGER ENDING | 9:30–10:00 | 70 words",
+  "text": "Close. The empty brass box. Then cut to: the Naagmani, glowing, sitting on the altar of the ruined temple. Someone placed it there — but not in the right place."
+ },
+ {
+  "kind": "sfx",
+  "after": 44,
+  "beat": "9 — CLIFFHANGER ENDING | 9:30–10:00 | 70 words",
+  "text": "संगीत — final dramatic swell, continues past the last word"
+ },
+ {
+  "kind": "sfx",
+  "after": 44,
+  "beat": "9 — CLIFFHANGER ENDING | 9:30–10:00 | 70 words",
+  "text": "हंसी — Naagkanya's laugh, distant, echoing"
+ },
+ {
+  "kind": "silent",
+  "after": 44,
+  "beat": "9 — CLIFFHANGER ENDING | 9:30–10:00 | 70 words",
+  "seconds": 15.0,
+  "text": "Wide atmosphere plate — the village at night. Every house dark. Fog rolling in from the forest. The temple ruins visible in the distance, a faint green glow emanating from within. Camera slowly pulls back until the entire village is visible — tiny, surrounded by endless dark forest. The green glow pulses. Fade to black."
+ }
+]
