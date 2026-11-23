@@ -23,6 +23,9 @@ if ! python3 -c "import skia" 2>/dev/null; then
   pip install -q "skia-python>=87.6" pillow scipy
 fi
 
+echo "==> PDF builder for the horror-script skill"
+pip install -q weasyprint
+
 echo "==> Piper voices for narration"
 pip install -q piper-tts
 mkdir -p "$TOOLS/voices"

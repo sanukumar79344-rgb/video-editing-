@@ -73,6 +73,13 @@ in HyperFrames.
   `make_reels.py` / `pro_render.py`. Network use is limited to Wikimedia Commons,
   Google Fonts and jsDelivr map data. Run its `scripts/check_setup.py` first.
 
+- `.claude/skills/hindi-horror-script-writer/` — supplied by the user, reviewed
+  before install. Writes a full 23-minute Hindi animated horror screenplay
+  (narration, dialogue, shot directions, silent beats, sound cues) from a topic
+  and renders it to PDF with `scripts/build_pdf.py`, which also reports the
+  script against its word-count, runtime and silent-beat targets. It fetches two
+  Google Fonts and installs weasyprint; nothing else leaves the machine.
+
 ## Making story videos (not clipping)
 
 `make_story.py` drives the cinematic-film skill end to end with a local voice:
