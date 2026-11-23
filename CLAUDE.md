@@ -80,6 +80,29 @@ in HyperFrames.
   script against its word-count, runtime and silent-beat targets. It fetches two
   Google Fonts and installs weasyprint; nothing else leaves the machine.
 
+## Making a horror story video (the user's main pipeline)
+
+When the user asks for a video, this is the route:
+
+1. **Script** — invoke the `hindi-horror-script-writer` skill with the topic. It
+   writes the screenplay (narration, dialogue, `[VISUAL]`, `[SILENT 12s]`,
+   `[SFX]`) and a PDF, and checks the draft against its own targets.
+2. **Project + voice** — `python3 screenplay.py script.txt Stories/<name>`
+   parses the screenplay into `script.json` (every line with who says it) and
+   `shots.json` (the directions), then voices it with Piper: the narrator reads
+   a little slower, male characters take pratham, female characters priyamvada,
+   chosen from the speaker's name. Lines are rendered one at a time and laid end
+   to end, so `audio/timing.json` is exact and the `[SILENT]` beats get their
+   seconds of room. No silence-detection step to go wrong.
+3. **Picture** — a scene file built on `anim.py` maps ranges of lines to shots,
+   reading the `[VISUAL]` directions for what each one shows.
+4. **Render** — `render(scenes, out, audio=...)`, 1920x1080, with the narration
+   muxed in.
+
+Art is the open question: `anim.py` draws flat vector village scenes in code.
+It will not pass for a hand-painted cartoon like Dream Toon — that needs
+generated or commissioned artwork, which the user has not decided on yet.
+
 ## Making story videos (not clipping)
 
 `make_story.py` drives the cinematic-film skill end to end with a local voice:
