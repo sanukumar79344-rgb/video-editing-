@@ -74,7 +74,8 @@ def build_scene_map(timing):
 
     # BEAT 8 — CONFRONTATION (376.6 - ~417.5s)
     scenes.append(("shot_16.jpg", 376.6, 385.7, "zoom_in"))   # Naagmani box open
-    scenes.append(("shot_17.jpg", 385.7, 405.7, "zoom_out"))  # Naagkanya reveal!
+    scenes.append(("shot_17.jpg", 385.7, 398.0, "zoom_out"))  # Naagkanya reveal!
+    scenes.append(("thumbnail.jpg", 398.0, 405.7, "zoom_in")) # Arjun + Naagmani + Naagkanya at temple
     scenes.append(("shot_18.jpg", 405.7, 417.5, "zoom_in"))   # Snakes flooding
 
     # BEAT 9 — CLIFFHANGER (417.5 - end)
