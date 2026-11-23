@@ -598,8 +598,9 @@ def _worker(args):
     scenes, fps, i0, i1, out, size = args
     scenes = pickle.loads(scenes)
     surf = skia.Surface(W, H)
+    # skia surfaces are BGRA, so the raw frames are fed to ffmpeg as bgra, not rgba
     ff = subprocess.Popen(
-        ["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgba", "-s", f"{W}x{H}",
+        ["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "bgra", "-s", f"{W}x{H}",
          "-r", str(fps), "-i", "-", "-an", "-c:v", "libx264", "-preset", "medium", "-crf", "16",
          "-pix_fmt", "yuv420p", "-vf", f"scale={size[0]}:{size[1]}:flags=lanczos", out],
         stdin=subprocess.PIPE)
@@ -800,3 +801,243 @@ class Prints(Layer):
             c.drawRoundRect(skia.RRect.MakeRectXY(skia.Rect.MakeXYWH(-s * 0.28, s * 0.42, s * 0.56, s * 0.42),
                                                   s * 0.16, s * 0.16), fill(self.color, 235))
             c.restore()
+
+
+# ---------------------------------------------------------------- colour village
+SKY_DAY_T, SKY_DAY_B = (86, 150, 214), (186, 214, 232)
+GRASS, GRASS_D = (120, 164, 76), (86, 128, 56)
+DIRT, DIRT_D = (186, 162, 120), (150, 126, 90)
+THATCH, THATCH_D = (214, 182, 110), (166, 136, 76)
+MUD, MUD_D = (206, 176, 142), (168, 136, 104)
+LEAF1, LEAF2, LEAF3 = (74, 136, 58), (96, 162, 70), (58, 110, 48)
+BARK = (104, 78, 56)
+SKIN = (226, 178, 136)
+SKIN_D = (196, 148, 108)
+HAIR = (30, 26, 28)
+
+
+def night(c, k=0.72):
+    """Push a daylight colour towards moonlight."""
+    return mix(tuple(int(v * (1 - k * 0.55)) for v in c), (34, 46, 96), k * 0.55)
+
+
+class Clouds(Layer):
+    def __init__(self, depth=0.05, n=5, y=0.18, color=(255, 255, 255), alpha=210, seed=30, speed=5):
+        super().__init__(depth, seed)
+        self.n, self.y, self.color, self.alpha, self.speed = n, y, color, alpha, speed
+
+    def draw(self, c, t, sc):
+        r = noise(self.seed)
+        for i in range(self.n):
+            x = (lerp(-W * 0.2, W * 1.2, i / max(1, self.n - 1)) + t * self.speed) % (W * 1.6) - W * 0.2
+            y = H * self.y + r.uniform(-H * 0.08, H * 0.08)
+            s = r.uniform(0.8, 1.6)
+            for dx, dy, rr in ((-90, 10, 60), (0, -18, 82), (86, 6, 64), (170, 16, 48)):
+                c.drawCircle(x + dx * s, y + dy * s, rr * s, fill(self.color, self.alpha))
+            c.drawRect(skia.Rect.MakeXYWH(x - 92 * s, y - 6 * s, 266 * s, 34 * s), fill(self.color, self.alpha))
+
+
+class ColorTree(Layer):
+    """A big canopy tree: trunk, branches, three tones of leaf, gentle sway."""
+
+    def __init__(self, depth=0.4, x=0.5, y=0.78, s=1.0, seed=31, dark=0.0, bare=False):
+        super().__init__(depth, seed)
+        self.x, self.y, self.s, self.dark, self.bare = x, y, s, dark, bare
+
+    def draw(self, c, t, sc):
+        r = noise(self.seed)
+        x, y, s = W * self.x, H * self.y, 420 * self.s
+        g = lambda col: night(col, self.dark) if self.dark else col
+        trunk = skia.Path()
+        trunk.moveTo(x - s * 0.1, y)
+        trunk.cubicTo(x - s * 0.07, y - s * 0.4, x - s * 0.09, y - s * 0.6, x - s * 0.05, y - s * 0.8)
+        trunk.lineTo(x + s * 0.05, y - s * 0.8)
+        trunk.cubicTo(x + s * 0.09, y - s * 0.6, x + s * 0.07, y - s * 0.4, x + s * 0.1, y)
+        trunk.close()
+        c.drawPath(trunk, fill(g(BARK)))
+        for s_ in (-1, 1):
+            br = skia.Path()
+            br.moveTo(x + s_ * s * 0.04, y - s * 0.62)
+            br.quadTo(x + s_ * s * 0.26, y - s * 0.78, x + s_ * s * 0.42, y - s * 0.92)
+            c.drawPath(br, skia.Paint(Color=rgb(g(BARK)), AntiAlias=True,
+                                      Style=skia.Paint.kStroke_Style, StrokeWidth=s * 0.05,
+                                      StrokeCap=skia.Paint.kRound_Cap))
+        if self.bare:
+            return
+        sway = math.sin(t * 0.6 + self.seed) * s * 0.012
+        for col, scale, off in ((LEAF3, 1.0, (0, 0)), (LEAF1, 0.86, (-s * 0.1, -s * 0.05)),
+                                (LEAF2, 0.62, (s * 0.12, -s * 0.12))):
+            for k in range(7):
+                a = k / 7 * 6.283 + r.uniform(-0.3, 0.3)
+                bx = x + off[0] + math.cos(a) * s * 0.42 * scale + sway
+                by = y - s * 1.0 + off[1] + math.sin(a) * s * 0.22 * scale
+                c.drawCircle(bx, by, s * r.uniform(0.2, 0.3) * scale, fill(g(col)))
+            c.drawCircle(x + off[0] + sway, y - s * 1.04 + off[1], s * 0.34 * scale, fill(g(col)))
+
+
+class ColorHut(Layer):
+    """Mud wall, thatched roof, door and a shuttered window."""
+
+    def __init__(self, depth=0.45, x=0.5, y=0.8, s=1.0, seed=32, dark=0.0, lit=False, flip=False):
+        super().__init__(depth, seed)
+        self.x, self.y, self.s, self.dark, self.lit, self.flip = x, y, s, dark, lit, flip
+
+    def draw(self, c, t, sc):
+        g = lambda col: night(col, self.dark) if self.dark else col
+        x, y, s = W * self.x, H * self.y, 420 * self.s
+        bw, bh = s, s * 0.52
+        c.drawRect(skia.Rect.MakeXYWH(x - bw / 2, y - bh, bw, bh), fill(g(MUD)))
+        c.drawRect(skia.Rect.MakeXYWH(x - bw / 2, y - bh * 0.18, bw, bh * 0.18), fill(g(MUD_D)))
+        roof = skia.Path()
+        roof.moveTo(x - bw * 0.66, y - bh)
+        roof.lineTo(x - bw * 0.1, y - bh - s * 0.42)
+        roof.lineTo(x + bw * 0.1, y - bh - s * 0.42)
+        roof.lineTo(x + bw * 0.66, y - bh)
+        roof.close()
+        c.drawPath(roof, fill(g(THATCH)))
+        for i in range(9):                                      # straw courses
+            u = i / 9
+            c.drawLine(x - bw * (0.66 - u * 0.5), y - bh - s * 0.42 * u + 4,
+                       x + bw * (0.66 - u * 0.5), y - bh - s * 0.42 * u + 4,
+                       skia.Paint(Color=rgb(g(THATCH_D), 150), AntiAlias=True, StrokeWidth=3))
+        dx = -1 if self.flip else 1
+        door = skia.Rect.MakeXYWH(x + dx * bw * 0.12, y - bh * 0.78, bw * 0.22, bh * 0.78)
+        c.drawRect(door, fill(g((96, 68, 46))))
+        win = skia.Rect.MakeXYWH(x - dx * bw * 0.3, y - bh * 0.72, bw * 0.17, bh * 0.34)
+        c.drawRect(win, fill(g((120, 90, 60)) if not self.lit else LAMP))
+        if self.lit:
+            fl = 0.8 + 0.2 * math.sin(t * 7 + self.seed)
+            c.drawRect(skia.Rect.MakeXYWH(win.x() - 60, win.y() - 60, win.width() + 120, win.height() + 120),
+                       fill(LAMP, int(70 * fl), blur=40))
+
+
+class DirtGround(Layer):
+    def __init__(self, depth=0.75, y=0.82, dark=0.0, seed=33, path=True):
+        super().__init__(depth, seed)
+        self.y, self.dark, self.path = y, dark, path
+
+    def draw(self, c, t, sc):
+        g = lambda col: night(col, self.dark) if self.dark else col
+        r = noise(self.seed)
+        c.drawRect(skia.Rect.MakeXYWH(-W, H * self.y, 3 * W, H), fill(g(GRASS)))
+        if self.path:
+            p = skia.Path()
+            p.moveTo(-W * 0.2, H * (self.y + 0.26))
+            p.quadTo(W * 0.5, H * (self.y + 0.02), W * 1.2, H * (self.y + 0.3))
+            p.lineTo(W * 1.3, H * 1.3); p.lineTo(-W * 0.3, H * 1.3); p.close()
+            c.drawPath(p, fill(g(DIRT)))
+        for _ in range(90):
+            x = r.uniform(-W * 0.2, W * 1.2); y = H * self.y + r.uniform(0, H * 0.22)
+            c.drawOval(skia.Rect.MakeXYWH(x, y, r.uniform(30, 90), r.uniform(8, 18)),
+                       fill(g(GRASS_D), 120))
+
+
+class Char(Layer):
+    """A village character: head with a face, hair, clothes, arms and legs.
+
+    kind: "man" (kurta and dhoti), "woman" (sari), "boy".
+    pose: "stand", "walk", "talk", "point".
+    """
+
+    def __init__(self, depth=0.7, x=0.5, y=0.88, h=0.34, kind="man", pose="stand",
+                 shirt=(176, 72, 96), lower=(238, 238, 234), hair=HAIR, skin=SKIN,
+                 face=1, dark=0.0, seed=34, speed=1.0):
+        super().__init__(depth, seed)
+        self.x, self.y, self.h, self.kind, self.pose = x, y, h, kind, pose
+        self.shirt, self.lower, self.hair, self.skin = shirt, lower, hair, skin
+        self.face, self.dark, self.speed = face, dark, speed
+
+    def draw(self, c, t, sc):
+        g = lambda col: night(col, self.dark) if self.dark else col
+        x, y, h = W * self.x, H * self.y, H * self.h
+        r = noise(self.seed)
+        ph = t * 5.4 * self.speed + self.seed
+        walk = self.pose == "walk"
+        bob = (abs(math.sin(ph)) if walk else 0.5 + 0.5 * math.sin(t * 1.5 + self.seed)) * h * 0.012
+        f = self.face
+        c.drawOval(skia.Rect.MakeXYWH(x - h * 0.19, y - h * 0.03, h * 0.38, h * 0.065),
+                   fill((0, 0, 0), 46, blur=8))
+        hip, sh = y - h * 0.44 - bob, y - h * 0.72 - bob
+        head_y = y - h * 0.86 - bob
+        hr = h * 0.115                                          # head radius
+
+        def limb(x1, y1, x2, y2, wd, col):
+            c.drawLine(x1, y1, x2, y2, skia.Paint(Color=rgb(g(col)), AntiAlias=True,
+                                                  Style=skia.Paint.kStroke_Style, StrokeWidth=wd,
+                                                  StrokeCap=skia.Paint.kRound_Cap))
+
+        swing = math.sin(ph) * (0.2 if walk else 0.0)
+        # legs
+        if self.kind == "woman":
+            sari = skia.Path()
+            sari.moveTo(x - h * 0.17, y)
+            sari.lineTo(x - h * 0.115, hip)
+            sari.lineTo(x + h * 0.115, hip)
+            sari.lineTo(x + h * 0.17, y)
+            sari.close()
+            c.drawPath(sari, fill(g(self.lower)))
+            c.drawPath(sari, skia.Paint(Color=rgb(g(mix(self.lower, (0, 0, 0), 0.18)), 110),
+                                        AntiAlias=True, Style=skia.Paint.kStroke_Style, StrokeWidth=3))
+        else:
+            for s_, ds in ((1, swing), (-1, -swing)):
+                limb(x + s_ * h * 0.035, hip, x + f * ds * h * 0.3 + s_ * h * 0.03, y - h * 0.02,
+                     h * 0.075, self.lower)
+                limb(x + f * ds * h * 0.3 + s_ * h * 0.03, y - h * 0.02,
+                     x + f * ds * h * 0.3 + s_ * h * 0.03 + f * h * 0.045, y, h * 0.05, (84, 62, 48))
+        # torso
+        torso = skia.Path()
+        torso.moveTo(x - h * 0.115, hip + h * 0.02)
+        torso.cubicTo(x - h * 0.13, hip - h * 0.1, x - h * 0.145, sh + h * 0.05, x - h * 0.135, sh)
+        torso.lineTo(x + h * 0.135, sh)
+        torso.cubicTo(x + h * 0.145, sh + h * 0.05, x + h * 0.13, hip - h * 0.1, x + h * 0.115, hip + h * 0.02)
+        torso.close()
+        c.drawPath(torso, fill(g(self.shirt)))
+        c.drawPath(torso, fill(g(mix(self.shirt, (0, 0, 0), 0.25)), 60))
+        if self.kind == "woman":                                 # pallu over one shoulder
+            pal = skia.Path()
+            pal.moveTo(x - h * 0.13, sh + h * 0.02)
+            pal.quadTo(x + h * 0.02, sh + h * 0.2, x + h * 0.1, hip + h * 0.12)
+            pal.lineTo(x + h * 0.16, hip + h * 0.1)
+            pal.quadTo(x + h * 0.04, sh + h * 0.16, x - h * 0.07, sh - h * 0.01)
+            pal.close()
+            c.drawPath(pal, fill(g(mix(self.lower, MOON, 0.08))))
+        # arms
+        ga = {"talk": math.sin(t * 2.6) * 0.5 + 0.6, "point": 1.25}.get(self.pose, 0.0)
+        for s_, ds in ((1, -swing), (-1, swing)):
+            ex = x + s_ * h * 0.14 + f * ds * h * 0.22 + (f * h * 0.2 * ga if s_ > 0 else 0)
+            ey = hip + h * 0.1 - (h * 0.22 * ga if s_ > 0 else 0)
+            limb(x + s_ * h * 0.12, sh + h * 0.05, ex, ey, h * 0.06, self.shirt)
+            c.drawCircle(ex, ey, h * 0.035, fill(g(self.skin)))
+        # neck and head
+        limb(x, sh + h * 0.01, x, head_y + hr * 0.7, h * 0.055, self.skin)
+        c.drawCircle(x, head_y, hr, fill(g(self.skin)))
+        c.drawOval(skia.Rect.MakeXYWH(x - hr * 1.02, head_y - hr * 0.1, hr * 0.3, hr * 0.5),
+                   fill(g(self.skin)))                           # ear
+        hair = skia.Path()                                       # hair
+        if self.kind == "woman":
+            hair.addOval(skia.Rect.MakeXYWH(x - hr * 1.05, head_y - hr * 1.12, hr * 2.1, hr * 1.5))
+            c.drawPath(hair, fill(g(self.hair)))
+            c.drawCircle(x - f * hr * 0.95, head_y + hr * 0.25, hr * 0.42, fill(g(self.hair)))
+        else:
+            hair.addArc(skia.Rect.MakeXYWH(x - hr * 1.04, head_y - hr * 1.1, hr * 2.08, hr * 2.0), 180, 180)
+            hair.lineTo(x + hr * 1.04, head_y - hr * 0.1)
+            hair.quadTo(x, head_y - hr * 0.45, x - hr * 1.04, head_y - hr * 0.1)
+            hair.close()
+            c.drawPath(hair, fill(g(self.hair)))
+        blink = 1.0 if (t * 0.6 + self.seed) % 4.0 > 0.14 else 0.1
+        for s_ in (0.34, -0.34):                                 # eyes
+            ex = x + f * hr * (s_ + 0.1)
+            c.drawOval(skia.Rect.MakeXYWH(ex - hr * 0.15, head_y - hr * 0.12 - hr * 0.13 * blink,
+                                          hr * 0.3, hr * 0.24 * blink + 2), fill((252, 252, 250)))
+            c.drawCircle(ex + f * hr * 0.04, head_y - hr * 0.05, hr * 0.1 * blink + 1, fill((28, 24, 22)))
+            c.drawLine(ex - hr * 0.2, head_y - hr * 0.36, ex + hr * 0.2, head_y - hr * 0.4,
+                       skia.Paint(Color=rgb(g(self.hair)), AntiAlias=True, StrokeWidth=hr * 0.1,
+                                  StrokeCap=skia.Paint.kRound_Cap))
+        c.drawLine(x + f * hr * 0.42, head_y + hr * 0.02, x + f * hr * 0.5, head_y + hr * 0.3,
+                   skia.Paint(Color=rgb(g(SKIN_D)), AntiAlias=True, StrokeWidth=hr * 0.08,
+                              StrokeCap=skia.Paint.kRound_Cap))
+        talk = self.pose == "talk"
+        mo = (0.2 + 0.8 * abs(math.sin(t * 7.5 + self.seed))) if talk else 0.25
+        c.drawOval(skia.Rect.MakeXYWH(x + f * hr * 0.2, head_y + hr * 0.45,
+                                      hr * 0.4, hr * 0.12 + hr * 0.3 * mo),
+                   fill((122, 54, 54) if talk else g(SKIN_D)))
