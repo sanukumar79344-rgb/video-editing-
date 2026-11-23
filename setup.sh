@@ -23,6 +23,19 @@ if ! python3 -c "import skia" 2>/dev/null; then
   pip install -q "skia-python>=87.6" pillow scipy
 fi
 
+echo "==> Piper voices for narration"
+pip install -q piper-tts
+mkdir -p "$TOOLS/voices"
+B=https://huggingface.co/rhasspy/piper-voices/resolve/main
+for v in en/en_US/ryan/high/en_US-ryan-high \
+         en/en_US/hfc_female/medium/en_US-hfc_female-medium \
+         hi/hi_IN/pratham/medium/hi_IN-pratham-medium \
+         hi/hi_IN/priyamvada/medium/hi_IN-priyamvada-medium; do
+  n=$(basename "$v")
+  [ -s "$TOOLS/voices/$n.onnx" ] || curl -sfL -o "$TOOLS/voices/$n.onnx" "$B/$v.onnx"
+  [ -s "$TOOLS/voices/$n.onnx.json" ] || curl -sfL -o "$TOOLS/voices/$n.onnx.json" "$B/$v.onnx.json"
+done
+
 echo "==> Captions font (Montserrat ExtraBold)"
 if ! fc-list | grep -qi montserrat; then
   mkdir -p /usr/local/share/fonts/reels

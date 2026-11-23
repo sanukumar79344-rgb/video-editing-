@@ -16,3 +16,8 @@ Assets/*
 !Assets/README.md
 Exports/*
 !Exports/README.md
+tools/voices/
+Stories/*/out/
+Stories/*/audio/
+Stories/*/fonts/
+Stories/*/assets/textures/

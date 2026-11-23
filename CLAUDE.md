@@ -73,6 +73,20 @@ in HyperFrames.
   `make_reels.py` / `pro_render.py`. Network use is limited to Wikimedia Commons,
   Google Fonts and jsDelivr map data. Run its `scripts/check_setup.py` first.
 
+## Making story videos (not clipping)
+
+`make_story.py` drives the cinematic-film skill end to end with a local voice:
+
+    new -> voice -> look -> draft -> final        (see Stories/GUIDE.md)
+
+Narration is Piper (`tools/voices/`): ryan and amy in English, pratham and
+priyamvada in Hindi. `tools/piper_take.py` speaks a take one line at a time and
+joins the lines with a real pause, because piper run over a whole take leaves
+almost no gap and the line splitter then sees one long line.
+
+`Stories/hooks.md` holds the hook shapes; the hook is the script's first line.
+Music is never fetched — the user supplies a track in `Assets/`.
+
 ## Folders
 
 | Folder | Holds |
