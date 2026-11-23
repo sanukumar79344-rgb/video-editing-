@@ -64,6 +64,15 @@ Nothing leaves the machine: transcription and rendering are local.
 Remotion and HyperFrames both need an explicit Chromium; telemetry is disabled
 in HyperFrames.
 
+## Skills in this repo
+
+- `.claude/skills/cinematic-film/` — third-party (MIT, Moh4696/cinematic-skill, commit
+  bf43556, reviewed before install). Makes narrated documentary/explainer films
+  entirely from code (Skia): script → voice → timed board of photos/cards/maps →
+  SFX → captions. It does not edit real footage; reels from real video stay with
+  `make_reels.py` / `pro_render.py`. Network use is limited to Wikimedia Commons,
+  Google Fonts and jsDelivr map data. Run its `scripts/check_setup.py` first.
+
 ## Folders
 
 | Folder | Holds |

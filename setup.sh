@@ -16,6 +16,13 @@ mkdir -p "$TOOLS"
 echo "==> Python: yt-dlp, faster-whisper, JS challenge solver"
 pip install -q --upgrade yt-dlp yt-dlp-ejs faster-whisper "opencv-python-headless<5" numpy
 
+echo "==> cinematic-film skill deps (skia needs EGL; espeak-ng is the scratch voice)"
+if ! python3 -c "import skia" 2>/dev/null; then
+  (apt-get install -y -q libegl1 libgl1 espeak-ng >/dev/null 2>&1 \
+    || (apt-get update -q >/dev/null && apt-get install -y -q libegl1 libgl1 espeak-ng >/dev/null))
+  pip install -q "skia-python>=87.6" pillow scipy
+fi
+
 echo "==> Captions font (Montserrat ExtraBold)"
 if ! fc-list | grep -qi montserrat; then
   mkdir -p /usr/local/share/fonts/reels
